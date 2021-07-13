@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'weatherModule/logic/cubits/WeatherCubit.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc.dart';
 import 'weatherModule/presentation/screens/HomeScreen.dart';
 
 void main() {
@@ -12,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => WeatherCubit(),
+      create: (context) => WeatherBloc(),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(

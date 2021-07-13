@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:weather_app/ThemeElements.dart';
-import '../../logic/cubits/WeatherCubit.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherEvent.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherState.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,10 +19,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController cityNameController;
   final _searchFormKey = GlobalKey<FormState>();
+  String _currentQueryValue = '';
+
   @override
   void initState() {
     super.initState();
     cityNameController = TextEditingController();
+    Timer.periodic(const Duration(seconds: 20), (timer) async {
+      WeatherState currentWeatherState = context.read<WeatherBloc>().state;
+      if (currentWeatherState is WeatherSucessState) {
+        context.read<WeatherBloc>().add(
+              WeatherUpdateEvent(
+                cityName: cityNameController.text,
+              ),
+            );
+      }
+    });
   }
 
   @override
@@ -67,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               height: 25,
             ),
-            BlocBuilder<WeatherCubit, WeatherState>(
+            BlocBuilder<WeatherBloc, WeatherState>(
               builder: (context, state) {
                 List<Widget> widgets = [];
                 widgets.add(
@@ -77,8 +93,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         if (state is WeatherFetchingState) {
                         } else if (_searchFormKey.currentState!.validate()) {
-                          BlocProvider.of<WeatherCubit>(context)
-                              .fetchWeather(cityNameController.text);
+                          String queryValue = cityNameController.text
+                              .trim()
+                              .replaceAll(RegExp(' '), '')
+                              .toLowerCase();
+
+                          if (this._currentQueryValue == '' ||
+                              this._currentQueryValue.compareTo(queryValue) !=
+                                  0) {
+                            context.read<WeatherBloc>().add(
+                                  WeatherFetchEvent(
+                                    cityName: cityNameController.text,
+                                  ),
+                                );
+                          }
+                          this._currentQueryValue = queryValue;
                         }
                       },
                       child: Builder(
