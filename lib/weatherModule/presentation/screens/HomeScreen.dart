@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:weather_app/ThemeElements.dart';
-import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc.dart';
-import 'package:weather_app/weatherModule/logic/bloc/WeatherEvent.dart';
-import 'package:weather_app/weatherModule/logic/bloc/WeatherState.dart';
+import 'package:weather_app/weatherModule/logic/bloc/InternetCubit/InternetCubit.dart';
+import 'package:weather_app/weatherModule/logic/bloc/InternetCubit/InternetState.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc/WeatherBloc.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc/WeatherEvent.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc/WeatherState.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -83,6 +85,19 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               height: 25,
             ),
+            BlocBuilder<InternetCubit, InternetState>(
+                builder: (context, state) {
+              if (state is InternetDisconnectedState) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Unable to connect with Internet. Please check internet connectivity.',
+                    style: ThemeElements.errorTextStyle,
+                  ),
+                );
+              }
+              return SizedBox();
+            }),
             BlocBuilder<WeatherBloc, WeatherState>(
               builder: (context, state) {
                 List<Widget> widgets = [];
@@ -91,6 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () {
+                        if (context.read<InternetCubit>().state
+                            is InternetDisconnectedState) {
+                          return;
+                        }
+
                         if (state is WeatherFetchingState) {
                         } else if (_searchFormKey.currentState!.validate()) {
                           String queryValue = cityNameController.text

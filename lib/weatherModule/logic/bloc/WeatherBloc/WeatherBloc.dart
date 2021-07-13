@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_app/weatherModule/errorHandling/WeatherModuleException.dart';
-import 'package:weather_app/weatherModule/logic/bloc/WeatherEvent.dart';
-import 'package:weather_app/weatherModule/logic/bloc/WeatherState.dart';
-import '../../data/models/WeatherData.dart';
-import '../../data/repositories/WeatherRespository.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc/WeatherEvent.dart';
+import 'package:weather_app/weatherModule/logic/bloc/WeatherBloc/WeatherState.dart';
+import '../../../data/models/WeatherData.dart';
+import '../../../data/repositories/WeatherRespository.dart';
 
 class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   final WeatherRepository _weatherRepository = WeatherRepository();
